@@ -1,5 +1,6 @@
 package org.tix.stream.maps;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.function.*;
 import java.util.stream.Collector;
@@ -12,183 +13,183 @@ import java.util.stream.Stream;
 public class Maps {
 
     /**
-     * Transforms <code>java.util.Map.Entry</code> to <code>org.tix.MapEntry</code>
+     * Transforms <code>java.util.Map.Entry</code> to <code>org.tix.Tuple</code>
      *
      * Should be used as,
      * <code>
-     *     anonymousMap.entrySet().stream.map(Maps::transform)
+     *     anonymousMap.entrySet().stream.map(Maps::toTuple)
      * </code>
      *
      * @param entry stream element to be transformed
      * @param <K> key type of the map entry
      * @param <V> value type of map entry
-     * @return MapEntry instance
+     * @return Tuple instance
      */
-    public static <K, V> MapEntry<K,V> transform(Map.Entry<K, V> entry) {
-        return MapEntry.of(entry.getKey(), entry.getValue());
+    public static <K, V> Tuple<K,V> toTuple(Map.Entry<K, V> entry) {
+        return Tuple.of(entry.getKey(), entry.getValue());
     }
 
     /**
-     * Returns a transformer function which transforms a ByConsumer of key and value to Consumer of MapEntry.
+     * Returns a transformer function which transforms a ByConsumer of key and value to Consumer of Tuple.
      *
      * <code>
-     *     streamOfMapEntry.peak(consumeEntries((key, value) -> System.out.println(key + ":" + value)));
+     *     streamOfTuple.peak(toEntry((key, value) -> System.out.println(key + ":" + value)));
      * </code>
      *
      * @param biConsumer consumer to consume key and value
      * @param <K> Key type
      * @param <V> Value type
-     * @return MapEntry consumer
+     * @return Tuple consumer
      */
-    public static <K,V> Consumer<MapEntry<K,V>> consumeEntries(BiConsumer<? super K, ? super V> biConsumer) {
-        return kvMapEntry -> biConsumer.accept(kvMapEntry.getKey(), kvMapEntry.getValue());
+    public static <K,V> Consumer<Tuple<K,V>> toEntry(BiConsumer<? super K, ? super V> biConsumer) {
+        return kvTuple -> biConsumer.accept(kvTuple.getKey(), kvTuple.getValue());
     }
 
     /**
-     * Returns a transformer function which transforms a Consumer of key to Consumer of MapEntry,
+     * Returns a transformer function which transforms a Consumer of key to Consumer of Tuple,
      * while preserving the value.
      *
      * <code>
-     *     streamOfMapEntry.peak(consumeKeys(key -> System.out.println(key)))
+     *     streamOfTuple.peak(toKey(key -> System.out.println(key)))
      * </code>
      * @param consumer Key consumer function
      * @param <K> Key type
      * @param <V> Value type
-     * @return MapEntry consumer
+     * @return Tuple consumer
      */
-    public static <K,V> Consumer<MapEntry<K,V>> consumeKeys(Consumer<? super K> consumer) {
+    public static <K,V> Consumer<Tuple<K,V>> toKey(Consumer<? super K> consumer) {
         return entry -> consumer.accept(entry.getKey());
     }
 
     /**
-     * Returns a transformer function which transforms a Consumer of value to Consumer of MapEntry,
+     * Returns a transformer function which transforms a Consumer of value to Consumer of Tuple,
      * while preserving the key.
      *
      * <code>
-     *     streamOfMapEntry.peak(consumeValues(value -> System.out.println(value));
+     *     streamOfTuple.peak(toValue(value -> System.out.println(value));
      * </code>
      *
      * @param consumer Value consumer function
      * @param <K> Key type
      * @param <V> Value function
-     * @return MapEntry consumer
+     * @return Tuple consumer
      */
-    public static <K,V> Consumer<MapEntry<K,V>> consumeValues(Consumer<? super V> consumer) {
+    public static <K,V> Consumer<Tuple<K,V>> toValue(Consumer<? super V> consumer) {
         return entry -> consumer.accept(entry.getValue());
     }
 
     /**
-     * Returns a transformer function which transforms a BiFunction of key and value to R, to Function of MapEntry to T,
+     * Returns a transformer function which transforms a BiFunction of key and value to R, to Function of Tuple to T,
      *
      * <code>
-     *     streamOfMapEntryStringString.map(entries((key, value) -> key + ":" + value);
+     *     streamOfTupleStringString.map(entries((key, value) -> key + ":" + value);
      * </code>
      *
      * @param biFunction Function which is used to transform key and value to R.
      * @param <K> Key type
      * @param <V> Value type
      * @param <R> Result type
-     * @return MapEntry to R function
+     * @return Tuple to R function
      */
-    public static <K, V, R> Function<MapEntry<K, V>, R> entries(BiFunction<? super K, ? super V, ? extends R> biFunction) {
+    public static <K, V, R> Function<Tuple<K, V>, R> entries(BiFunction<? super K, ? super V, ? extends R> biFunction) {
         return entry -> biFunction.apply(entry.getKey(), entry.getValue());
     }
 
     /**
-     * Returns a transformer function which transforms Key mapping function to MapEntry mapping function.
+     * Returns a transformer function which transforms Key mapping function to Tuple mapping function.
      *
      * <code>
-     *     streamOfMapEntryStringString.map(keys(key -> "key : " + key);
+     *     streamOfTupleStringString.map(keys(key -> "key : " + key);
      * </code>
      *
      * @param function Function which is used to transform key to R
      * @param <K> Key type
      * @param <V> Value type
      * @param <R> Result type
-     * @return MapEntry to R function
+     * @return Tuple to R function
      */
-    public static <K, V, R> Function<MapEntry<K, V>, MapEntry<R, V>> keys(Function<? super K, ? extends R> function) {
-        return kvMapEntry -> MapEntry.of(function.apply(kvMapEntry.getKey()), kvMapEntry.getValue());
+    public static <K, V, R> Function<Tuple<K, V>, Tuple<R, V>> keys(Function<? super K, ? extends R> function) {
+        return kvTuple -> Tuple.of(function.apply(kvTuple.getKey()), kvTuple.getValue());
     }
 
     /**
-     * Returns a transformer function which transforms Value mapping function to MapEntry mapping Function.
+     * Returns a transformer function which transforms Value mapping function to Tuple mapping Function.
      *
      * <code>
-     *     streamOfMapEntryStringString.map(values(value -> "value :" + value);
+     *     streamOfTupleStringString.map(values(value -> "value :" + value);
      * </code>
      *
      * @param function Function which is usd to transform value to R
      * @param <K> Key type
      * @param <V> Value type
      * @param <R> Result type
-     * @return MapEntry to R function
+     * @return Tuple to R function
      */
-    public static <K, V, R> Function<MapEntry<K, V>, MapEntry<K, R>> values(Function<? super V, ? extends R> function) {
-        return kvMapEntry -> MapEntry.of(kvMapEntry.getKey(), function.apply(kvMapEntry.getValue()));
+    public static <K, V, R> Function<Tuple<K, V>, Tuple<K, R>> values(Function<? super V, ? extends R> function) {
+        return kvTuple -> Tuple.of(kvTuple.getKey(), function.apply(kvTuple.getValue()));
     }
 
     /**
      * Swaps the key and value of map entry.
      *
      * <code>
-     *     streamOfMapEntryStringInt.map(Maps::swap);
+     *     streamOfTupleStringInt.map(Maps::swap);
      * </code>
      *
      * @param entry entry to be swapped.
      * @param <K> Key type
      * @param <V> Value type
-     * @return MapEntry to R function.
+     * @return Tuple to R function.
      */
-    public static <K, V> MapEntry<V, K> swap(MapEntry<K, V> entry) {
-        return MapEntry.of(entry.getValue(), entry.getKey());
+    public static <K, V> Tuple<V, K> swap(Tuple<K, V> entry) {
+        return Tuple.of(entry.getValue(), entry.getKey());
     }
 
     /**
-     * Returns a transformer function which transforms a ByPredicate of key and value to a Predicate of MapEntry.
+     * Returns a transformer function which transforms a ByPredicate of key and value to a Predicate of Tuple.
      *
      * <code>
-     *     streamOfMapEntryIntInt.filter(predicateEntries((key, value) -> key + value > 10);
+     *     streamOfTupleIntInt.filter(ifEntry((key, value) -> key + value > 10);
      * </code>
      *
      * @param biPredicate predicate function which consumes key and value seperately
      * @param <K> Key type
      * @param <V> Value type
-     * @return MapEntry predicate.
+     * @return Tuple predicate.
      */
-    public static <K, V> Predicate<MapEntry<K, V>> predicateEntries(BiPredicate<? super K, ? super V> biPredicate) {
+    public static <K, V> Predicate<Tuple<K, V>> ifEntry(BiPredicate<? super K, ? super V> biPredicate) {
         return entry -> biPredicate.test(entry.getKey(), entry.getValue());
     }
 
     /**
-     * Returns a transformer function which transforms key Predicate to a MapEntry Predicate.
+     * Returns a transformer function which transforms key Predicate to a Tuple Predicate.
      *
      * <code>
-     *     streamOfMapEntryIntInt.filter(predicateKeys(key -> key > 10);
+     *     streamOfTupleIntInt.filter(ifKey(key -> key > 10);
      * </code>
      *
      * @param predicate Key predicate
      * @param <K> Key type
      * @param <V> Value type
-     * @return MapEntry Predicate
+     * @return Tuple Predicate
      */
-    public static <K, V> Predicate<MapEntry<K, V>> predicateKeys(Predicate<? super K> predicate) {
+    public static <K, V> Predicate<Tuple<K, V>> ifKey(Predicate<? super K> predicate) {
         return entry -> predicate.test(entry.getKey());
     }
 
     /**
-     * Returns a transformer function which transforms value Predicate to a MapEntry Predicate.
+     * Returns a transformer function which transforms value Predicate to a Tuple Predicate.
      *
      * <code>
-     *     streamOfMapEntryIntInt.filter(predicateValues(value -> value > 10);
+     *     streamOfTupleIntInt.filter(ifValue(value -> value > 10);
      * </code>
      *
      * @param predicate Value predicate
      * @param <K> Key type
      * @param <V> Value type
-     * @return MapEntry Predicate
+     * @return Tuple Predicate
      */
-    public static <K, V> Predicate<MapEntry<K, V>> predicateValues(Predicate<? super V> predicate) {
+    public static <K, V> Predicate<Tuple<K, V>> ifValue(Predicate<? super V> predicate) {
         return entry -> predicate.test(entry.getValue());
     }
 
@@ -196,48 +197,80 @@ public class Maps {
      * Returns a transformer function which transforms function of value to Stream<R>. useful in flatMap function.
      *
      * <code>
-     *     streamOfMapEntryIntInt.flatMap(valuesStream(value -> Stream.of(value));
+     *     streamOfTupleIntInt.flatMap(withValue(value -> Stream.of(value));
      * </code>
      *
      * @param function function produces R stream using values
      * @param <K> Key type
      * @param <V> Value type
      * @param <R> Result type
-     * @return MapEntry to Stream MapEntry function.
+     * @return Tuple to Stream Tuple function.
      */
-    public static <K, V, R> Function<MapEntry<K, V>, Stream<MapEntry<K, R>>> valuesStream(Function<V, Stream<R>> function) {
-        return entry -> function.apply(entry.getValue()).map(MapEntry.withKey(entry.getKey()));
+    public static <K, V, R> Function<Tuple<K, V>, Stream<Tuple<K, R>>> withValue(Function<V, Stream<R>> function) {
+        return entry -> function.apply(entry.getValue()).map(Tuple.withKey(entry.getKey()));
     }
 
     /**
      * Returns a transformer function which transforms function of key to Stream<R>. useful in flatMap function.
      *
      * <code>
-     *     streamOfMapEntryIntInt.flatMap(keyStream(key -> Stream.of(key));
+     *     streamOfTupleIntInt.flatMap(withKey(key -> Stream.of(key));
      * </code>
      *
      * @param function function produces R stream using keys
      * @param <K> Key type
      * @param <V> Value type
      * @param <R> Result type
-     * @return MapEntry to Stream MapEntry function.
+     * @return Tuple to Stream Tuple function.
      */
-    public static <K, V, R> Function<MapEntry<K, V>, Stream<MapEntry<R, V>>> keysStream(Function<K, Stream<R>> function) {
-        return entry -> function.apply(entry.getKey()).map(MapEntry.withValue(entry.getValue()));
+    public static <K, V, R> Function<Tuple<K, V>, Stream<Tuple<R, V>>> withKey(Function<K, Stream<R>> function) {
+        return entry -> function.apply(entry.getKey()).map(Tuple.withValue(entry.getValue()));
     }
 
     /**
-     * Returns a collector which is collects MapEntries to a map.
+     * Returns a collector which is collects Tuples to a map.
      *
      * <code>
-     *     streamOfMapEntryIntInt.collect(Maps.toMap());
+     *     streamOfTupleIntInt.collect(Maps.toMap());
      * </code>
      *
      * @param <K> Key type
      * @param <V> Value type
-     * @return MapEntry to java.util.Map collector
+     * @return Tuple to java.util.Map collector
      */
-    public static <K, V> Collector<MapEntry<K, V>, ?, Map<K, V>> toMap() {
-        return Collectors.toMap(MapEntry::getKey, MapEntry::getValue);
+    public static <K, V> Collector<Tuple<K, V>, ?, Map<K, V>> toMap() {
+        return Collectors.toMap(Tuple::getKey, Tuple::getValue);
+    }
+
+    /**
+     * Returns a transformer which transforms key comparator to tuple comparator.
+     *
+     * <code>
+     *     streamOfTupleIntInt.sorted(byKey((a, b) -> a < b);
+     * </code>
+     *
+     * @param comparator Key comparator
+     * @param <K> Key type
+     * @param <V> Value type
+     * @return Tuple comparator
+     */
+    public static <K, V> Comparator<Tuple<K, V>> byKey(Comparator<K> comparator) {
+        return (o1, o2) -> comparator.compare(o1.getKey(), o2.getKey());
+    }
+
+    /**
+     * Returns a transformer which transforms value comparator to tuple comparator.
+     *
+     * <code>
+     *     streamOfTupleIntInt.sorted(byValue((a, b) -> a < b);
+     * </code>
+     *
+     * @param comparator Value comparator
+     * @param <K> Key type
+     * @param <V> Value type
+     * @return Tuple comparator
+     */
+    public static <K, V> Comparator<Tuple<K, V>> byValue(Comparator<V> comparator) {
+        return (o1, o2) -> comparator.compare(o1.getValue(), o2.getValue());
     }
 }
