@@ -37,7 +37,8 @@ public class MapsTest {
     @Test
     public void testToEntryComparator() throws Exception {
         ArrayList<String> strings = new ArrayList<>();
-        hashMap.entrySet().stream().map(Maps::toTuple).forEach(toEntry((a, b) -> strings.add(a + ":" + b)));
+        hashMap.entrySet().stream().map(Maps::toTuple)
+                .forEach(toEntry((a, b) -> strings.add(a + ":" + b)));
 
         assertTrue(strings.contains("1:first"));
         assertTrue(strings.contains("2:second"));
@@ -132,9 +133,9 @@ public class MapsTest {
     }
 
     @Test
-    public void testIfEntry() throws Exception {
+    public void testIsEntry() throws Exception {
         Map<Integer, String> result = hashMap.entrySet().stream().map(Maps::toTuple)
-                .filter(ifEntry((i, s) -> i < 4 && s.length() == 6))
+                .filter(isEntry((i, s) -> i < 4 && s.length() == 6))
                 .collect(toMap());
 
         assertEquals(1, result.size());
@@ -142,9 +143,9 @@ public class MapsTest {
     }
 
     @Test
-    public void testIfKey() throws Exception {
+    public void testIsKey() throws Exception {
         Map<Integer, String> results = hashMap.entrySet().stream().map(Maps::toTuple)
-                .filter(ifKey(k -> k % 2 == 0))
+                .filter(isKey(k -> k % 2 == 0))
                 .collect(toMap());
 
         assertEquals(2, results.size());
@@ -153,9 +154,9 @@ public class MapsTest {
     }
 
     @Test
-    public void testIfValue() throws Exception {
+    public void testIsValue() throws Exception {
         Map<Integer, String> results = hashMap.entrySet().stream().map(Maps::toTuple)
-                .filter(ifValue(v -> v.length() == 6))
+                .filter(isValue(v -> v.length() == 6))
                 .collect(toMap());
 
         assertEquals(2, results.size());

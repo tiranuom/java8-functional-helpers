@@ -149,7 +149,7 @@ public class Maps {
      * Returns a transformer function which transforms a ByPredicate of key and value to a Predicate of Tuple.
      *
      * <code>
-     *     streamOfTupleIntInt.filter(ifEntry((key, value) -> key + value > 10);
+     *     streamOfTupleIntInt.filter(isEntry((key, value) -> key + value > 10);
      * </code>
      *
      * @param biPredicate predicate function which consumes key and value seperately
@@ -157,7 +157,7 @@ public class Maps {
      * @param <V> Value type
      * @return Tuple predicate.
      */
-    public static <K, V> Predicate<Tuple<K, V>> ifEntry(BiPredicate<? super K, ? super V> biPredicate) {
+    public static <K, V> Predicate<Tuple<K, V>> isEntry(BiPredicate<? super K, ? super V> biPredicate) {
         return entry -> biPredicate.test(entry.getKey(), entry.getValue());
     }
 
@@ -165,7 +165,7 @@ public class Maps {
      * Returns a transformer function which transforms key Predicate to a Tuple Predicate.
      *
      * <code>
-     *     streamOfTupleIntInt.filter(ifKey(key -> key > 10);
+     *     streamOfTupleIntInt.filter(isKey(key -> key > 10);
      * </code>
      *
      * @param predicate Key predicate
@@ -173,7 +173,7 @@ public class Maps {
      * @param <V> Value type
      * @return Tuple Predicate
      */
-    public static <K, V> Predicate<Tuple<K, V>> ifKey(Predicate<? super K> predicate) {
+    public static <K, V> Predicate<Tuple<K, V>> isKey(Predicate<? super K> predicate) {
         return entry -> predicate.test(entry.getKey());
     }
 
@@ -181,7 +181,7 @@ public class Maps {
      * Returns a transformer function which transforms value Predicate to a Tuple Predicate.
      *
      * <code>
-     *     streamOfTupleIntInt.filter(ifValue(value -> value > 10);
+     *     streamOfTupleIntInt.filter(isValue(value -> value > 10);
      * </code>
      *
      * @param predicate Value predicate
@@ -189,7 +189,7 @@ public class Maps {
      * @param <V> Value type
      * @return Tuple Predicate
      */
-    public static <K, V> Predicate<Tuple<K, V>> ifValue(Predicate<? super V> predicate) {
+    public static <K, V> Predicate<Tuple<K, V>> isValue(Predicate<? super V> predicate) {
         return entry -> predicate.test(entry.getValue());
     }
 
