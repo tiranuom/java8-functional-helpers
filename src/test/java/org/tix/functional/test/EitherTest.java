@@ -2,6 +2,7 @@ package org.tix.functional.test;
 
 import org.testng.annotations.Test;
 import org.tix.functional.Either;
+import org.tix.functional.Exceptions;
 
 import static org.testng.Assert.assertEquals;
 
@@ -17,5 +18,20 @@ public class EitherTest {
 
         Either<String, Integer> leftFlatMapped = error.left().flatMap(t -> right);
         assertEquals(right, leftFlatMapped);
+    }
+
+    @Test
+    public void testException() throws Exception {
+
+        Either<UnsupportedOperationException, Integer> either = Exceptions
+                .catching(UnsupportedOperationException.class)
+                .either(this::throwException);
+
+        System.out.println(either.isLeft());
+
+    }
+
+    public int throwException() {
+        throw new UnsupportedOperationException();
     }
 }
