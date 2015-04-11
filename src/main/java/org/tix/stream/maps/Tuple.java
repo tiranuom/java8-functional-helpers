@@ -5,40 +5,40 @@ import java.util.function.Function;
 /**
  * Created by tiran on 4/10/15.
  */
-public final class Tuple<K, V> {
-    private K key;
-    private V value;
+public final class Tuple<T, U> {
+    private T first;
+    private U second;
 
-    private Tuple(K key, V value) {
-        this.key = key;
-        this.value = value;
+    private Tuple(T first, U second) {
+        this.first = first;
+        this.second = second;
     }
 
-    public K getKey() {
-        return key;
+    public T getFirst() {
+        return first;
     }
 
-    public void setKey(K key) {
-        this.key = key;
+    public void setFirst(T first) {
+        this.first = first;
     }
 
-    public V getValue() {
-        return value;
+    public U getSecond() {
+        return second;
     }
 
-    public void setValue(V value) {
-        this.value = value;
+    public void setSecond(U second) {
+        this.second = second;
     }
 
-    public static <K, V> Tuple<K, V> of(K k, V v) {
+    public static <T, U> Tuple<T, U> of(T k, U v) {
         return new Tuple<>(k,v);
     }
 
-    public static <K, V>Function<K, Tuple<K, V>> withValue(V value) {
-        return k -> of(k, value);
+    public static <T, U>Function<T, Tuple<T, U>> withSecond(U second) {
+        return first -> of(first, second);
     }
 
-    public static <K, V>Function<V, Tuple<K, V>> withKey(K key) {
-        return v -> of(key, v);
+    public static <T, U>Function<U, Tuple<T, U>> withFirst(T first) {
+        return second -> of(first, second);
     }
 }

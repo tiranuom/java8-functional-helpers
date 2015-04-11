@@ -178,7 +178,7 @@ public class MapsTest {
     public void testByKey() throws Exception {
         List<String> list = hashMap.entrySet().stream().map(Maps::toTuple)
                 .sorted(byKey(Comparator.<Integer>reverseOrder()))
-                .map(Tuple::getValue).collect(toList());
+                .map(Tuple::getSecond).collect(toList());
         assertEquals("fifth", list.get(0));
         assertEquals("fourth", list.get(1));
         assertEquals("third", list.get(2));
@@ -191,7 +191,7 @@ public class MapsTest {
     public void testByValue() throws Exception {
         List<Integer> list = hashMap.entrySet().stream().map(Maps::toTuple)
                 .sorted(byValue(comparing(String::length)))
-                .map(Tuple::getKey).collect(toList());
+                .map(Tuple::getFirst).collect(toList());
 
         assertTrue(1 == list.get(0));
         assertTrue(3 == list.get(1));

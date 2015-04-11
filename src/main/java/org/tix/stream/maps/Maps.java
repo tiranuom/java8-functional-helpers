@@ -42,7 +42,7 @@ public class Maps {
      * @return Tuple consumer
      */
     public static <K,V> Consumer<Tuple<K,V>> toEntry(BiConsumer<? super K, ? super V> biConsumer) {
-        return kvTuple -> biConsumer.accept(kvTuple.getKey(), kvTuple.getValue());
+        return kvTuple -> biConsumer.accept(kvTuple.getFirst(), kvTuple.getSecond());
     }
 
     /**
@@ -58,7 +58,7 @@ public class Maps {
      * @return Tuple consumer
      */
     public static <K,V> Consumer<Tuple<K,V>> toKey(Consumer<? super K> consumer) {
-        return entry -> consumer.accept(entry.getKey());
+        return entry -> consumer.accept(entry.getFirst());
     }
 
     /**
@@ -75,7 +75,7 @@ public class Maps {
      * @return Tuple consumer
      */
     public static <K,V> Consumer<Tuple<K,V>> toValue(Consumer<? super V> consumer) {
-        return entry -> consumer.accept(entry.getValue());
+        return entry -> consumer.accept(entry.getSecond());
     }
 
     /**
@@ -92,7 +92,7 @@ public class Maps {
      * @return Tuple to R function
      */
     public static <K, V, R> Function<Tuple<K, V>, R> entries(BiFunction<? super K, ? super V, ? extends R> biFunction) {
-        return entry -> biFunction.apply(entry.getKey(), entry.getValue());
+        return entry -> biFunction.apply(entry.getFirst(), entry.getSecond());
     }
 
     /**
@@ -109,7 +109,7 @@ public class Maps {
      * @return Tuple to R function
      */
     public static <K, V, R> Function<Tuple<K, V>, Tuple<R, V>> keys(Function<? super K, ? extends R> function) {
-        return kvTuple -> Tuple.of(function.apply(kvTuple.getKey()), kvTuple.getValue());
+        return kvTuple -> Tuple.of(function.apply(kvTuple.getFirst()), kvTuple.getSecond());
     }
 
     /**
@@ -126,7 +126,7 @@ public class Maps {
      * @return Tuple to R function
      */
     public static <K, V, R> Function<Tuple<K, V>, Tuple<K, R>> values(Function<? super V, ? extends R> function) {
-        return kvTuple -> Tuple.of(kvTuple.getKey(), function.apply(kvTuple.getValue()));
+        return kvTuple -> Tuple.of(kvTuple.getFirst(), function.apply(kvTuple.getSecond()));
     }
 
     /**
@@ -142,7 +142,7 @@ public class Maps {
      * @return Tuple to R function.
      */
     public static <K, V> Tuple<V, K> swap(Tuple<K, V> entry) {
-        return Tuple.of(entry.getValue(), entry.getKey());
+        return Tuple.of(entry.getSecond(), entry.getFirst());
     }
 
     /**
@@ -158,7 +158,7 @@ public class Maps {
      * @return Tuple predicate.
      */
     public static <K, V> Predicate<Tuple<K, V>> isEntry(BiPredicate<? super K, ? super V> biPredicate) {
-        return entry -> biPredicate.test(entry.getKey(), entry.getValue());
+        return entry -> biPredicate.test(entry.getFirst(), entry.getSecond());
     }
 
     /**
@@ -174,7 +174,7 @@ public class Maps {
      * @return Tuple Predicate
      */
     public static <K, V> Predicate<Tuple<K, V>> isKey(Predicate<? super K> predicate) {
-        return entry -> predicate.test(entry.getKey());
+        return entry -> predicate.test(entry.getFirst());
     }
 
     /**
@@ -190,14 +190,14 @@ public class Maps {
      * @return Tuple Predicate
      */
     public static <K, V> Predicate<Tuple<K, V>> isValue(Predicate<? super V> predicate) {
-        return entry -> predicate.test(entry.getValue());
+        return entry -> predicate.test(entry.getSecond());
     }
 
     /**
      * Returns a transformer function which transforms function of value to Stream<R>. useful in flatMap function.
      *
      * <code>
-     *     streamOfTupleIntInt.flatMap(withValue(value -> Stream.of(value));
+     *     streamOfTupleIntInt.flatMap(withSecond(value -> Stream.of(value));
      * </code>
      *
      * @param function function produces R stream using values
@@ -207,14 +207,14 @@ public class Maps {
      * @return Tuple to Stream Tuple function.
      */
     public static <K, V, R> Function<Tuple<K, V>, Stream<Tuple<K, R>>> withValue(Function<V, Stream<R>> function) {
-        return entry -> function.apply(entry.getValue()).map(Tuple.withKey(entry.getKey()));
+        return entry -> function.apply(entry.getSecond()).map(Tuple.withFirst(entry.getFirst()));
     }
 
     /**
      * Returns a transformer function which transforms function of key to Stream<R>. useful in flatMap function.
      *
      * <code>
-     *     streamOfTupleIntInt.flatMap(withKey(key -> Stream.of(key));
+     *     streamOfTupleIntInt.flatMap(withFirst(key -> Stream.of(key));
      * </code>
      *
      * @param function function produces R stream using keys
@@ -224,7 +224,7 @@ public class Maps {
      * @return Tuple to Stream Tuple function.
      */
     public static <K, V, R> Function<Tuple<K, V>, Stream<Tuple<R, V>>> withKey(Function<K, Stream<R>> function) {
-        return entry -> function.apply(entry.getKey()).map(Tuple.withValue(entry.getValue()));
+        return entry -> function.apply(entry.getFirst()).map(Tuple.withSecond(entry.getSecond()));
     }
 
     /**
@@ -239,7 +239,7 @@ public class Maps {
      * @return Tuple to java.util.Map collector
      */
     public static <K, V> Collector<Tuple<K, V>, ?, Map<K, V>> toMap() {
-        return Collectors.toMap(Tuple::getKey, Tuple::getValue);
+        return Collectors.toMap(Tuple::getFirst, Tuple::getSecond);
     }
 
     /**
@@ -255,7 +255,7 @@ public class Maps {
      * @return Tuple comparator
      */
     public static <K, V> Comparator<Tuple<K, V>> byKey(Comparator<K> comparator) {
-        return (o1, o2) -> comparator.compare(o1.getKey(), o2.getKey());
+        return (o1, o2) -> comparator.compare(o1.getFirst(), o2.getFirst());
     }
 
     /**
@@ -271,6 +271,6 @@ public class Maps {
      * @return Tuple comparator
      */
     public static <K, V> Comparator<Tuple<K, V>> byValue(Comparator<V> comparator) {
-        return (o1, o2) -> comparator.compare(o1.getValue(), o2.getValue());
+        return (o1, o2) -> comparator.compare(o1.getSecond(), o2.getSecond());
     }
 }
