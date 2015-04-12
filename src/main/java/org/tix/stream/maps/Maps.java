@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Created by tiran on 4/10/15.
+ *
  */
 public class Maps {
 
@@ -106,10 +106,30 @@ public class Maps {
      * @param <K> Key type
      * @param <V> Value type
      * @param <R> Result type
-     * @return Tuple to R function
+     * @return Tuple to Tuple function
      */
     public static <K, V, R> Function<Tuple<K, V>, Tuple<R, V>> keys(Function<? super K, ? extends R> function) {
         return kvTuple -> Tuple.of(function.apply(kvTuple.getFirst()), kvTuple.getSecond());
+    }
+
+    /**
+     * Returns a transformer function which transforms Key mapping function to Tuple mapping function.
+     * Optimized for UnaryOperator, by modifying the existing Tuple rather than creating new Tuple.
+     *
+     * <code>
+     *     streamOfTupleStringString.map(keysUnary(key -> "key : " + key);
+     * </code>
+     *
+     * @param operator UnaryOperator which is used to transform key;
+     * @param <K> Key type
+     * @param <V> Value type
+     * @return Tuple to Tuple function.
+     */
+    public static <K, V> Function<Tuple<K, V>, Tuple<K, V>> keysUnary(UnaryOperator<K> operator) {
+        return kvTuple -> {
+            kvTuple.setFirst(operator.apply(kvTuple.getFirst()));
+            return kvTuple;
+        };
     }
 
     /**
@@ -119,14 +139,34 @@ public class Maps {
      *     streamOfTupleStringString.map(values(value -> "value :" + value);
      * </code>
      *
-     * @param function Function which is usd to transform value to R
+     * @param function Function which is used to transform value to R
      * @param <K> Key type
      * @param <V> Value type
      * @param <R> Result type
-     * @return Tuple to R function
+     * @return Tuple to Tuple function
      */
     public static <K, V, R> Function<Tuple<K, V>, Tuple<K, R>> values(Function<? super V, ? extends R> function) {
         return kvTuple -> Tuple.of(kvTuple.getFirst(), function.apply(kvTuple.getSecond()));
+    }
+
+    /**
+     * Returns a transformer function which transforms Value mapping function to Tuple mapping function.
+     * Optimized for UnaryOperator, by modifying the existing Tuple rather than creating new Tuple.
+     *
+     * <code>
+     *     streamOfTupleStringString.map(valuesUnary(value -> "value :" + value);
+     * </code>
+     *
+     * @param operator UnaryOperator which is used to transform value;
+     * @param <K> Key type
+     * @param <V> Value type
+     * @return Tuple to Tuple function.
+     */
+    public static <K, V> Function<Tuple<K, V>, Tuple<K, V>> valuesUnary(UnaryOperator<V> operator) {
+        return kvTuple -> {
+            kvTuple.setSecond(operator.apply(kvTuple.getSecond()));
+            return kvTuple;
+        };
     }
 
     /**

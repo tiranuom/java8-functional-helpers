@@ -28,7 +28,35 @@ public class EitherTest {
                 .either(this::throwException);
 
         System.out.println(either.isLeft());
+    }
 
+    @Test
+    public void testExceptionPerformance() throws Exception {
+
+        Either<UnsupportedOperationException, Integer> either = null;
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < 10000; i++) {
+            either = catchF();
+        }
+        System.out.println(System.currentTimeMillis() - startTime);
+        System.out.println(either);
+
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < 10000; i++) {
+            either = Exceptions
+                    .catching(UnsupportedOperationException.class)
+                    .either(this::throwException);
+        }
+        System.out.println(System.currentTimeMillis() - startTime);
+        System.out.println(either);
+    }
+
+    public Either<UnsupportedOperationException, Integer> catchF () {
+        try {
+            return Either.right(throwException());
+        } catch (UnsupportedOperationException e) {
+            return Either.left(e);
+        }
     }
 
     public int throwException() {
